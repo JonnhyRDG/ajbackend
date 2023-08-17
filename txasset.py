@@ -5,6 +5,7 @@ import re
 import shutil
 from threading import Thread
 from queue import Queue
+from pprint import pprint as pp
 
 def removeFiles(path, mode='remove'):
 	inifiles = glob.glob(path)
@@ -51,27 +52,28 @@ for path in result:
 ###### Uses ImageMagick to convert the MID textures to 1024*1024 and LOW to 512*512, writes out the file ######
 texfiles = glob.glob("I:/asset_texture/*/*/publish/maps/hi/*")
 for hiinfile in texfiles:
-	lowoutfiles = os.path.abspath(hiinfile.replace("hi","low"))
-	midoutfiles = os.path.abspath(hiinfile.replace("hi","mid"))
-	midexist = os.path.exists(midoutfiles)
+	if os.path.splitext(hiinfile)[1] in ['.jpg','.png','.tif','.exr']:
+		lowoutfiles = os.path.abspath(hiinfile.replace("hi","low"))
+		midoutfiles = os.path.abspath(hiinfile.replace("hi","mid"))
+		midexist = os.path.exists(midoutfiles)
 
-	if not midexist:
-		subprocess.call(['C:/Program Files/ImageMagick-6.9.12-Q16/convert.exe', hiinfile, '-resize', '1024x1024', midoutfiles])
-		confirmmid = "___________________________{filename} - has been copied and rezised correctly___________________________".format(filename = midoutfiles)
-		print(confirmmid)
-	else:
-		midexists = "{} already exists!".format(midoutfiles)
-		print(midexists)
+		if not midexist:
+			subprocess.call(['C:/Program Files/ImageMagick-6.9.12-Q16/convert.exe', hiinfile, '-resize', '1024x1024', midoutfiles])
+			confirmmid = "___________________________{filename} - has been copied and rezised correctly___________________________".format(filename = midoutfiles)
+			print(confirmmid)
+		else:
+			midexists = "{} already exists!".format(midoutfiles)
+			print(midexists)
 
-	
-	lowexist = os.path.exists(lowoutfiles)
-	if not lowexist:
-		subprocess.call(['C:/Program Files/ImageMagick-6.9.12-Q16/convert.exe', hiinfile, '-resize', '512x512', lowoutfiles])
-		confirmlow = "___________________________{filename} - has been copied and rezised correctly___________________________".format(filename = lowoutfiles)
-		print(confirmlow)
-	else:
-		lowexists = "{} already exists!".format(lowoutfiles)
-		print(lowexists)
+
+		lowexist = os.path.exists(lowoutfiles)
+		if not lowexist:
+			subprocess.call(['C:/Program Files/ImageMagick-6.9.12-Q16/convert.exe', hiinfile, '-resize', '512x512', lowoutfiles])
+			confirmlow = "___________________________{filename} - has been copied and rezised correctly___________________________".format(filename = lowoutfiles)
+			print(confirmlow)
+		else:
+			lowexists = "{} already exists!".format(lowoutfiles)
+			print(lowexists)
 
 print('#_________________________________________________LOW and MID folders created, FILES resized___________________#')
 
@@ -110,31 +112,31 @@ jobs = Queue()
 paths = glob.glob("I:\\asset_texture\\*\\*\\publish\\maps\\*\\*")
 
 for tex in paths:
-		
-	extension = tex.split('.')
-	removecspace = extension[0].rsplit('_',1)[0]
-	txpath = '{filename}.{extension}'.format(filename=removecspace,extension='tx')
-	txout = os.path.abspath(txpath.replace("I:\\asset_texture\\","P:\\AndreJukebox\\assets\\"))
-	findspace = extension[0].split("_")[-1]
-	colorspace = re.search(findspace, tex)
-	convert = colorspace.group(0)
-	print(txout)
-	print(convert)
-	colorspace_dict = {
-			'rec709':'linear',
-			'linear':'linear',
-			'raw':'raw'
-	}
+	if os.path.splitext(hiinfile)[1] in ['.jpg', '.png', '.tif', '.exr']:
+		extension = tex.split('.')
+		removecspace = extension[0].rsplit('_',1)[0]
+		txpath = '{filename}.{extension}'.format(filename=removecspace,extension='tx')
+		txout = os.path.abspath(txpath.replace("I:\\asset_texture\\","P:\\AndreJukebox\\assets\\"))
+		findspace = extension[0].split("_")[-1]
+		colorspace = re.search(findspace, tex)
+		convert = colorspace.group(0)
+		print(txout)
+		print(convert)
+		colorspace_dict = {
+				'rec709':'linear',
+				'linear':'linear',
+				'raw':'raw'
+		}
 
-	ocio_cspace = colorspace_dict.get(convert)
-	colorconfig = "P:/AndreJukebox/pipe/ocio/flimic/config.ocio"
-	command = 'P:/AndreJukebox/pipe/ktoa/ktoa4.1.2.1_kat5/bin/maketx.exe -v -u --colorconfig {ocio} --colorconvert {orig} {cspace} --oiio {textin} -o {txdest}'.format(ocio=colorconfig,cspace=ocio_cspace,textin=tex,txdest=txout,orig=convert)
-	txexist = os.path.exists(txout)
-	print(command)
-	if not txexist:
-		jobs.put(command)
-	else:
-		print('TX file already exists. Skipping')
+		ocio_cspace = colorspace_dict.get(convert)
+		colorconfig = "P:/AndreJukebox/pipe/ocio/filmic/config.ocio"
+		command = 'P:/AndreJukebox/pipe/ktoa/ktoa4.1.2.1_kat5/bin/maketx.exe -v -u --colorconfig {ocio} --colorconvert {orig} {cspace} --oiio {textin} -o {txdest}'.format(ocio=colorconfig,cspace=ocio_cspace,textin=tex,txdest=txout,orig=convert)
+		txexist = os.path.exists(txout)
+		print(command)
+		if not txexist:
+			jobs.put(command)
+		else:
+			print('TX file already exists. Skipping')
 
 for i in range(10):
 	worker = Thread(target=cmd_open, args=(jobs,))
