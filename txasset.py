@@ -40,8 +40,8 @@ for key in paths_dict.keys():
 ####### Generate all the LOW and MID folders for the lower res textures ######
 result = glob.glob("I:/asset_texture/*/*/publish/maps/hi")
 for path in result:
-	lowdir = os.path.abspath(path.replace("hi","low"))
-	middir = os.path.abspath(path.replace("hi","mid"))
+	lowdir = os.path.abspath(path.replace("\\hi\\","\\low\\"))
+	middir = os.path.abspath(path.replace("\\hi\\","\\mid\\"))
 	isExist = os.path.exists(lowdir)
 	isExist = os.path.exists(middir)
 	if not isExist:
@@ -130,7 +130,7 @@ for tex in paths:
 
 		ocio_cspace = colorspace_dict.get(convert)
 		colorconfig = "P:/AndreJukebox/pipe/ocio/filmic/config.ocio"
-		command = 'P:/AndreJukebox/pipe/ktoa/ktoa4.1.2.1_kat5/bin/maketx.exe -v -u --colorconfig {ocio} --colorconvert {orig} {cspace} --oiio {textin} -o {txdest}'.format(ocio=colorconfig,cspace=ocio_cspace,textin=tex,txdest=txout,orig=convert)
+		command = 'P:/AndreJukebox/pipe/ktoa/ktoa4.1.6.0_kat4/bin/maketx.exe -v -u --colorconfig {ocio} --colorconvert {orig} {cspace} --oiio {textin} -o {txdest}'.format(ocio=colorconfig,cspace=ocio_cspace,textin=tex,txdest=txout,orig=convert)
 		txexist = os.path.exists(txout)
 		print(command)
 		if not txexist:
