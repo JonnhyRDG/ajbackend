@@ -28,16 +28,16 @@ def removeFiles(path, mode='remove'):
 		else:
 			os.remove(files)
 
-for key in paths_dict.keys():
-	print(paths_dict[key])
-	paths = paths_dict[key]
-	print (type(paths))
-	if type(paths) is list:
-		for path in paths:
-			print(path," ", key)
-			removeFiles(path,mode=key)
+	for key in paths_dict.keys():
+		print(paths_dict[key])
+		paths = paths_dict[key]
+		print (type(paths))
+		if type(paths) is list:
+			for path in paths:
+				print(path," ", key)
+				removeFiles(path,mode=key)
 
-texfiles = glob.glob("P:\\AndreJukebox_dev\\asset_texture\\*\\*\\publish\\maps\\hi\\*")
+	texfiles = glob.glob("P:\\AndreJukebox_dev\\asset_texture\\*\\*\\publish\\maps\\hi\\*")
 
 def cmd_open(jobinput):
 	while not jobinput.empty():
