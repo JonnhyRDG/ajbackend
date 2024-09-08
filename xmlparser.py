@@ -73,5 +73,5 @@ def assetListFromXML(xml):
         with open(json_out_path[xml], 'w') as outdict:
             json.dump(dicttype[xml], outdict)
 
-# assetListFromXML(xml="xmlcity")
-assetListFromXML(xml="xmlblock")
+assetListFromXML(xml="xmlcity")
+# assetListFromXML(xml="xmlblock")
