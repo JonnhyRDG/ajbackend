@@ -37,7 +37,7 @@ def removeFiles(path, mode='remove'):
 				print(path," ", key)
 				removeFiles(path,mode=key)
 
-	texfiles = glob.glob("P:\\AndreJukebox_dev\\asset_texture\\*\\*\\publish\\maps\\hi\\*")
+	
 
 def cmd_open(jobinput):
 	while not jobinput.empty():
@@ -64,23 +64,19 @@ def maketx(texture):
 		ocio_cspace = colorspace_dict.get(convert)
 		colorconfig = "P:\\AndreJukebox\\pipe\\ocio\\filmic\\config.ocio"
 		command = f'P:\\AndreJukebox\\pipe\\ktoa\\ktoa4.2.3.2_kat6\\bin\\maketx.exe -v -u --colorconfig {colorconfig} --colorconvert {convert} {ocio_cspace} --oiio {texture} -o {txout}'
-		txexist = os.path.exists(txout)
 		print(command)
-
-		if not txexist:
-			print("NEEDS TO CREATE")
-			jobs.put(command)
-		else:
-			print(f'{txout} TX file already exists. Skipping.')
+		jobs.put(command)
+		
 
 def maketxjobs():
-	for i in range(10):
+	for i in range(32):
 		worker = Thread(target=cmd_open, args=(jobs,))
 		worker.start()
 	print("waiting for queue to complete", jobs.qsize(), "tasks")
 	jobs.join()
 
 def makeAllTx():
+	texfiles = glob.glob("P:\\AndreJukebox_dev\\asset_texture\\*\\*\\publish\\maps\\hi\\*")
 	for tex in texfiles:
 		maketx(texture=tex)
 	maketxjobs()
@@ -91,8 +87,9 @@ def makeTxAsset(asset,object):
 	else:
 		assetpath = f'P:\\AndreJukebox_dev\\asset_texture\\*\\{asset}\\publish\\maps\\hi\\{asset}_{object}_*'
 	assettextures = glob.glob(assetpath)
+	print(assetpath)
 	for t in assettextures:
 		maketx(t)
 	maketxjobs()
 
-makeTxAsset('andre','')
+makeTxAsset('skysc00','interior')
